@@ -1,11 +1,11 @@
 import pytest
 
-from api_v1.forms.type_converters import DefaultTypeConverter
+from api_v1.forms.type_converters import DefaultTypeConverter, TypeChecker
 
 
 class TestUtils:
 
-    @pytest.mark.utils
+    @pytest.mark.converter
     def test_convert_dict(self, dictionary_to_convert):
         converter = DefaultTypeConverter(
             target=dictionary_to_convert,
@@ -21,7 +21,7 @@ class TestUtils:
             float_='float',
         )
 
-    @pytest.mark.utils
+    @pytest.mark.converter
     def test_pattern_values(self, dictionary_to_convert):
         converter = DefaultTypeConverter(
             target=dictionary_to_convert,
@@ -34,3 +34,9 @@ class TestUtils:
             date1='date',
             date2='date',
         )
+
+    @pytest.mark.converter
+    def test_check_types(self, converted_dictionary):
+        checker = TypeChecker(converted_dictionary)
+        not_raised = checker.convert()
+        assert not_raised is not None

@@ -152,17 +152,17 @@ class TypeChecker(BaseTypeConverter):
 
     @classmethod
     def convert_date(self, value):
-        if not self._type_check(value=value):
+        if not self._type_check(self, value):
             raise_type_convert_error(value, str(self.allow_types))
 
     @classmethod
     def convert_phone(self, value):
-        if not self._type_check(value=value):
+        if not self._type_check(self, value):
             raise_type_convert_error(value, str(self.allow_types))
 
     @classmethod
     def convert_email(self, value):
-        if not self._type_check(value=value):
+        if not self._type_check(self, value):
             raise_type_convert_error(value, str(self.allow_types))
 
     @classmethod
@@ -175,5 +175,5 @@ class TypeChecker(BaseTypeConverter):
 
     @classmethod
     def convert_text(self, value):
-        if not self._type_check(value=value):
+        if not self._type_check(self, value):
             raise_type_convert_error(value, str(self.allow_types))

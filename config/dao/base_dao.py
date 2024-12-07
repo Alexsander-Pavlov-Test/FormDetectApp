@@ -1,4 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorCollection
+from bson.objectid import ObjectId
 from typing import ClassVar
 
 from config.dao.dao_types import MongoType
@@ -74,3 +75,12 @@ class BaseDAO:
         new_object = await (cls.model
                             .find_one(dict(_id=created_object.inserted_id)))
         return new_object
+
+    @classmethod
+    async def delete(cls,
+                     _id: ObjectId,
+                     ) -> None:
+        """
+        Удаление сущности по ID
+        """
+        await cls.model.delete_one(dict(_id=_id))

@@ -5,9 +5,12 @@ from bson.objectid import ObjectId
 from config.models import FormSchema
 
 
-ObjectIdField = Annotated[ObjectId | str,
-                          BeforeValidator(lambda arg: str(arg)),
-                          ]
+StrObjectIdField = Annotated[ObjectId | str,
+                             BeforeValidator(lambda arg: str(arg)),
+                             ]
+ObjectIdFieldFormStr = Annotated[ObjectId | str,
+                                 BeforeValidator(lambda arg: ObjectId(arg)),
+                                 ]
 
 
 class CreateForm(FormSchema):
@@ -21,5 +24,12 @@ class ViewForm(CreateForm):
     """
     Просмотра формы
     """
-    id: ObjectIdField = Field(alias='_id')
+    id: StrObjectIdField = Field(alias='_id')
     name: str
+
+
+class DeleteForm(FormSchema):
+    """
+    Удаление формы
+    """
+    id: ObjectIdFieldFormStr = Field(alias='_id')

@@ -1,4 +1,5 @@
-from .type_converters import DefaultTypeConverter
+from .type_converters import DefaultTypeConverter, TypeChecker
 
 
-__all__ = ('DefaultTypeConverter',)
+__all__ = ('DefaultTypeConverter',
+           'TypeChecker',)

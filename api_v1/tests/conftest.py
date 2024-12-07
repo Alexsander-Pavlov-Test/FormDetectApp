@@ -22,3 +22,14 @@ def dictionary_to_convert():
         integer='33',
         float_='44.2',
     )
+
+
+@pytest.fixture
+def converted_dictionary():
+    return dict(
+        name='text',
+        phone='phone',
+        email='email',
+        date1='date',
+        date2='date',
+    )
