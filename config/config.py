@@ -1,6 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, MongoDsn, IPvAnyNetwork
 from starlette.config import Config
 from celery.schedules import crontab
 
@@ -12,24 +12,16 @@ log_dir = base_dir.joinpath('logs')
 config = Config('.env')
 
 
-class AlembicSettings(BaseModel):
-    """
-    Настройки Alembic
-    """
-    CONFIG_PATH: Path = Path('alembic.ini')
-    MIGRATION_PATH: Path = Path('async_alembic/')
-
-
-class TestDBSettings(BaseModel):
-    """
-    Настройки тестовой базы данных
-    """
-    _engine: str = config('TEST_DB_ENGINE')
-    _owner: str = config('TEST_DB_USER')
-    _password: str = config('TEST_DB_PASSWORD')
-    _name: str = config('TEST_DB_HOST')
-    _db_name: str = config('TEST_DB_NAME')
-    url: str = f'{_engine}://{_owner}:{_password}@{_name}/{_db_name}'
+# class TestDBSettings(BaseModel):
+#     """
+#     Настройки тестовой базы данных
+#     """
+#     _engine: str = config('TEST_DB_ENGINE')
+#     _owner: str = config('TEST_DB_USER')
+#     _password: str = config('TEST_DB_PASSWORD')
+#     _name: str = config('TEST_DB_HOST')
+#     _db_name: str = config('TEST_DB_NAME')
+#     url: str = f'{_engine}://{_owner}:{_password}@{_name}/{_db_name}'
 
 
 class DBSettings(BaseModel):
@@ -37,11 +29,10 @@ class DBSettings(BaseModel):
     Настройки DataBase
     """
     _engine: str = config('DB_ENGINE')
-    _owner: str = config('DB_USER')
-    _password: str = config('DB_PASSWORD')
-    _name: str = config('DB_HOST')
-    _db_name: str = config('DB_NAME')
-    url: str = f'{_engine}://{_owner}:{_password}@{_name}/{_db_name}'
+    _owner: str = config('MONGO_USER')
+    _password: str = config('MONGO_PASSWORD')
+    _name: IPvAnyNetwork = config('DB_HOST')
+    url: MongoDsn = f'{_engine}://{_owner}:{_password}@{_name}'
 
 
 class CelerySettings(BaseModel):
@@ -87,10 +78,9 @@ class Settings(BaseSettings):
         extra='ignore',
     )
     db: DBSettings = DBSettings()
-    test_db: TestDBSettings = TestDBSettings()
+    # test_db: TestDBSettings = TestDBSettings()
     celery: CelerySettings = CelerySettings()
     rabbit: RabbitSettings = RabbitSettings()
-    alembic: AlembicSettings = AlembicSettings()
     debug: bool = bool(int(config('DEBUG')))
     API_PREFIX: str = '/api/v1'
     BASE_DIR: Path = base_dir

@@ -1,10 +1,7 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import Select
-from sqlalchemy.orm import joinedload, selectinload
-from typing import ClassVar, Sequence
+from motor.motor_asyncio import AsyncIOMotorCollection
+from typing import ClassVar
 
-from config import BaseModel
+from config.dao.dao_types import MongoType
 
 
 class BaseDAO:
@@ -15,145 +12,65 @@ class BaseDAO:
 
     CRUD модели
 
-    Примеры::
+    Для реализации DAO определенной модели необходимо:
+    - Наследоваться от данного класса
+    - Переопределить атрибут класса `BaseDAO.model`
 
-        # Поиск сущности
-        item = ModelDAO.find_item_by_args(
-            session=session,
-            id=3,
-        )
-        # Множественный поиск сущностей
-        items = ModelDAO.find_all_items_by_args(
-            session = session,
-            one_to_many = (Model.tag,),
-            name='model',
-        )
-        # Создание сущности
-        item = ModelDAO.add(
-            session,
-            id=3,
-            name='model',
-            )
+    ## Примеры:
+    ```python
+    # Создание
+    values = dict(
+        name='some_name',
+        some_value='some_value',
+    )
+    item = await FormDAO.add(values)
+    item = await FormDAO.find_item_by_args(
+        values,
+    )
+    items = await FormDAO.find_all_items_by_args(
+        values,
+    )
+    ```
     """
-    model: ClassVar[BaseModel | None] = None
+
+    model: ClassVar[AsyncIOMotorCollection | None] = None
 
     @classmethod
     async def find_item_by_args(cls,
-                                session: AsyncSession,
-                                one_to_many: Sequence[BaseModel] | None = None,
-                                many_to_many: Sequence[BaseModel] | None = None,
-                                **kwargs: dict[str, str | int],
-                                ) -> BaseModel:
+                                **kwargs: dict[str, str],
+                                ) -> MongoType:
         """
         Нахождение и возращение сущности
 
-        Args:
-            session (AsyncSession): Текущая сессия
-
-            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-                для one_to_many
-                которые имеют отношение например: (Product.user)
-
-            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-                для many_to_many
-                которые имеют отношение например: (Product.categories)
-
         Returns:
-            BaseModel: Сущность из выборки
+            MongoType: Сущность из выборки
         """
-        stmt = struct_options_statment(
-            model=cls.model,
-            one_to_many=one_to_many,
-            many_to_many=many_to_many,
-            **kwargs,
-        )
-        result = await session.scalar(statement=stmt)
+        result = await cls.model.find_one(kwargs)
         return result
 
     @classmethod
     async def find_all_items_by_args(cls,
-                                     session: AsyncSession,
-                                     one_to_many: Sequence[BaseModel] | None = None,
-                                     many_to_many: Sequence[BaseModel] | None = None,
                                      **kwargs: dict[str, str | int],
-                                     ) -> list[BaseModel]:
+                                     ) -> list[MongoType]:
         """
         Нахождение и возращение множества сущностей
 
-        Args:
-            session (AsyncSession): Текущая сессия
-
-            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-                для one_to_many
-                которые имеют отношение например: (Product.user)
-
-            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-                для many_to_many
-                которые имеют отношение например: (Product.categories)
-
         Returns:
-            BaseModel: Сущности из выборки
+            list[MongoType]: Сущности из выборки
         """
-        stmt = struct_options_statment(
-            model=cls.model,
-            one_to_many=one_to_many,
-            many_to_many=many_to_many,
-            **kwargs,
-        )
-        result = await session.scalars(statement=stmt)
-        return list(result)
+        list_objects = []
+        async for object_ in cls.model.find(kwargs):
+            list_objects.append(object_)
+        return list_objects
 
     @classmethod
     async def add(cls,
-                  session: AsyncSession,
                   **values,
-                  ) -> BaseModel:
-        async with session.begin():
-            instance = cls.model(**values)
-            session.add(instance=instance)
-            try:
-                await session.commit()
-            except SQLAlchemyError as ex:
-                await session.rollback()
-                raise ex
-            return instance
-
-
-def struct_options_statment(model: BaseModel,
-                            one_to_many: Sequence[BaseModel] | None = None,
-                            many_to_many: Sequence[BaseModel] | None = None,
-                            **kwargs: dict[str, str | int],
-                            ) -> Select:
-    """
-    Струкрутирование запроса SELECT для выборки
-
-    Args:
-        model (BaseModel): Модель таблицы для выборки
-        one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-            для one_to_many
-            которые имеют отношение например: (Product.user)
-
-        many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
-            для many_to_many
-            которые имеют отношение например: (Product.categories)
-
-    Returns:
-        Select: Экземпляр запроса
-    """
-    if one_to_many and many_to_many:
-        stmt = (Select(model)
-                .filter_by(**kwargs)
-                .options(joinedload(*one_to_many))
-                .options(selectinload(*many_to_many)))
-    elif one_to_many:
-        stmt = (Select(model)
-                .filter_by(**kwargs)
-                .options(joinedload(*one_to_many)))
-    elif many_to_many:
-        stmt = (Select(model)
-                .filter_by(**kwargs)
-                .options(selectinload(*many_to_many)))
-    else:
-        stmt = (Select(model)
-                .filter_by(**kwargs))
-    return stmt
+                  ) -> MongoType:
+        """
+        Создание и возвращение сущности из базы данных
+        """
+        created_object = await cls.model.insert_one(values)
+        new_object = await (cls.model
+                            .find_one(dict(_id=created_object.inserted_id)))
+        return new_object
