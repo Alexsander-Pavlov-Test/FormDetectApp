@@ -5,7 +5,9 @@ from bson.objectid import ObjectId
 from config.models import FormSchema
 
 
-ObjectIdField = Annotated[ObjectId | str, BeforeValidator(lambda arg: str(arg))]
+ObjectIdField = Annotated[ObjectId | str,
+                          BeforeValidator(lambda arg: str(arg)),
+                          ]
 
 
 class CreateForm(FormSchema):

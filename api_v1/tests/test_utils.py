@@ -1,14 +1,36 @@
 import pytest
-from api_v1.forms.utils import ConvertObjectIDMixin
+
+from api_v1.forms.type_converters import DefaultTypeConverter
 
 
 class TestUtils:
 
     @pytest.mark.utils
-    def test_converter_key_id(self, dictionary):
-        mixin = ConvertObjectIDMixin()
-        converted_dict = mixin.convert_id(
-            dictionary=dictionary,
+    def test_convert_dict(self, dictionary_to_convert):
+        converter = DefaultTypeConverter(
+            target=dictionary_to_convert,
         )
-        assert converted_dict.get('id') is not None
-        assert converted_dict.get('_id') is None
+        new_dict = converter.convert()
+        assert new_dict == dict(
+            name='text',
+            phone='phone',
+            email='email',
+            date1='date',
+            date2='date',
+            integer='int',
+            float_='float',
+        )
+
+    @pytest.mark.utils
+    def test_pattern_values(self, dictionary_to_convert):
+        converter = DefaultTypeConverter(
+            target=dictionary_to_convert,
+        )
+        pattern_dict = converter.get_for_pattern()
+        assert pattern_dict == dict(
+            name='text',
+            phone='phone',
+            email='email',
+            date1='date',
+            date2='date',
+        )

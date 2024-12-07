@@ -9,3 +9,16 @@ def dictionary():
                 value='email',
                 value_2='phone',
                 )
+
+
+@pytest.fixture
+def dictionary_to_convert():
+    return dict(
+        name='some',
+        phone='+7 913 553 1120',
+        email='some@yandex.ru',
+        date1='1990-01-20',
+        date2='20.01.1990',
+        integer='33',
+        float_='44.2',
+    )
