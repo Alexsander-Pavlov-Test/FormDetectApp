@@ -7,6 +7,7 @@ from http import HTTPStatus
 
 from config.setup_logs.logging import logger
 from api_v1.exeptions import ValidationError
+from api_v1.forms.type_converters.base_converter.exeptions import TypeConvertError
 
 
 def register_errors(app: FastAPI) -> None:
@@ -67,6 +68,21 @@ def register_errors(app: FastAPI) -> None:
     ):
         """
         Логирование всех ValidationError
+        """
+        logger.opt(exception=True).warning(exc)
+        response = dict(
+            status=False,
+            error_code=exc.status_code,
+            message=exc.detail,
+        )
+        return JSONResponse(response)
+
+    async def type_error_handler(
+        request: Request,
+        exc: TypeConvertError,
+    ):
+        """
+        Логирование всех TypeConvertError
         """
         logger.opt(exception=True).warning(exc)
         response = dict(
