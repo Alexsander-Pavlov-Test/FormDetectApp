@@ -80,11 +80,8 @@ converter.convert()
 ```
 # Quick start
 ## Enviroments
-Необходимо заполнить **.env.sample** и в последствии перемеиновать его в **.env**
-```python
-# .env.sample
-MONGO_PASSWORD=password # Пароль от базы данных (Настройка)
-```
+Необходимо **.env.sample** перемеиновать в **.env**
+
 ## Docker
 Шаблон находится под системой управления и контеризации - **Docker**.
 Если у вас нет Docker - вы можете установить его с официального сайта: [Docker](https://www.docker.com/get-started/)
