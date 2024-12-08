@@ -10,7 +10,7 @@ from api_v1.forms.schemas import (
 
 from api_v1.forms.type_converters import TypeChecker, DefaultTypeConverter
 from api_v1.forms.type_converters.base_converter.exeptions import TypeConvertError
-from api_v1.forms.utils import construct_list_names
+
 
 router = APIRouter(prefix='/forms',
                    tags=['Forms'],

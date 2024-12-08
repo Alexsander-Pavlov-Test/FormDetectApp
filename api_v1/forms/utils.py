@@ -1,4 +1,7 @@
 from config.dao.dao_types import MongoType
+from typing import TypeVar
+
+TD = TypeVar('TD', bound=dict[str, str])
 
 
 def construct_list_names(execute_list: list[MongoType]) -> list[str]:
@@ -18,8 +21,8 @@ def construct_list_names(execute_list: list[MongoType]) -> list[str]:
     return list_forms
 
 
-def construct_key_value_dictionaries(dictionary: dict[str, str],
-                                     ) -> list[dict[str, str]]:
+def construct_key_value_dictionaries(dictionary: TD,
+                                     ) -> list[TD]:
     """
     Составление из одного словаря, множество словарей
     вмещающие в себя `ключ - значение` каждого поля в

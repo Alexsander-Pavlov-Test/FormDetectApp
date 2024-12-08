@@ -141,8 +141,6 @@ class TypeChecker(BaseTypeConverter):
         settings.DATE_FIELD,
         settings.PHONE_FIELD,
         settings.EMAIL_FIELD,
-        settings.FLOAT_FIELD,
-        settings.INT_FIELD,
         settings.TEXT_FIELD,
     )
 
@@ -166,11 +164,13 @@ class TypeChecker(BaseTypeConverter):
 
     @classmethod
     def convert_float(self, value):
-        pass
+        if not self._type_check(self, value):
+            raise_type_convert_error(value, str(self.allow_types))
 
     @classmethod
     def convert_int(self, value):
-        pass
+        if not self._type_check(self, value):
+            raise_type_convert_error(value, str(self.allow_types))
 
     @classmethod
     def convert_text(self, value):

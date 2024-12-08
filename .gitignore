@@ -56,6 +56,11 @@ cover/
 *.mo
 *.pot
 
+#MongoDB
+config/database/datadir/journal/*
+config/database/datadir/diagnostic.data/*
+config/database/datadir/mongod.lock
+
 # Django stuff:
 *.log
 local_settings.py
@@ -84,10 +89,6 @@ target/
 # IPython
 profile_default/
 ipython_config.py
-
-# MongoDB
-config/database/datadir/*
-!config/database/datadir/README.md
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
