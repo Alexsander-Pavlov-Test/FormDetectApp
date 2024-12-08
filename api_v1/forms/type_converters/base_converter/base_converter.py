@@ -1,6 +1,7 @@
 from typing import Any, Iterator
 from .abc import AbctractTypeConverter
 from collections.abc import MutableMapping
+from loguru import logger
 
 
 class BaseTypeConverter(AbctractTypeConverter):
@@ -51,10 +52,18 @@ class BaseTypeConverter(AbctractTypeConverter):
     def _convert_types(self,
                        value: str
                        ) -> Any:
+        logger.info(f'get value before {value}')
         for converter in self.type_checkers:
             convert = converter(value=value)
             if convert:
+                logger.info(f'get value after {convert}')
                 return convert
+
+    def _normazire_value(self, value: str) -> str:
+        logger.info(f'before normalize {value}')
+        normalized_value = value.strip("'").strip('"').replace(' ', '+', 1)
+        logger.info(f'after normalize {normalized_value}')
+        return normalized_value
 
     def __getitem__(self, key: Any) -> Any:
         value = self.contaiter[key]
@@ -82,9 +91,10 @@ class BaseTypeConverter(AbctractTypeConverter):
             yield (key, item)
 
     def convert(self) -> MutableMapping:
-        for values in self:
-            self[values[0]] = self._convert_types(
-                value=values[-1],
-            )
-        self._converted = True
-        return self
+        if not self._converted:
+            for values in self:
+                self[values[0]] = self._convert_types(
+                    value=self._normazire_value(values[-1]),
+                )
+            self._converted = True
+        return self.contaiter

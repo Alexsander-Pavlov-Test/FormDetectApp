@@ -1,4 +1,4 @@
-from pydantic import BeforeValidator, Field
+from pydantic import BeforeValidator, Field, BaseModel
 from typing import Annotated
 from bson.objectid import ObjectId
 
@@ -13,19 +13,32 @@ ObjectIdFieldFormStr = Annotated[ObjectId | str,
                                  ]
 
 
-class CreateForm(FormSchema):
+class ParamsFormCreation(FormSchema):
+    """
+    Параметры для создания формы
+    """
+
+
+class CreateForm(BaseModel):
     """
     Создание формы
     """
     name: str
+    params: ParamsFormCreation
 
 
-class ViewForm(CreateForm):
+class ViewForm(FormSchema):
     """
-    Просмотра формы
+    Просмотр формы
     """
     id: StrObjectIdField = Field(alias='_id')
     name: str
+
+
+class GetFormConvertSchema(FormSchema):
+    """
+    Схема получения конвертированной формы
+    """
 
 
 class DeleteForm(FormSchema):

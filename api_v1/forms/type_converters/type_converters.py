@@ -108,9 +108,8 @@ class DefaultTypeConverter(BaseTypeConverter):
     @classmethod
     def convert_phone(self, value):
         copy_value = value
-        copy_value = copy_value.replace(' ', '')
         if (copy_value.startswith('+') and
-           copy_value.replace('+', '').isdigit()
+           copy_value.replace(' ', '').replace('+', '').isdigit()
            and len(copy_value) > 11):
             return settings.PHONE_FIELD
 
@@ -123,7 +122,7 @@ class DefaultTypeConverter(BaseTypeConverter):
         Получение словаря по принципу паттерна
 
         Это означает что выведется словарь только с
-        значениями `date`, 'phone', 'email', 'text'
+        значениями `date`, `phone`, `email`, `text`
         """
         if not self._converted:
             self.convert()
