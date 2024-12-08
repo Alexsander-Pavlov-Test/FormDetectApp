@@ -21,13 +21,13 @@ docker compose up
 ```
 - После успешного запуска приложение будет доступно по адрессу: http://localhost:8080
 # Usage
-Работать с энд поинтами можно по адруссу http://localhost:8080/docs
+Работать с энд поинтами можно по адрeссу http://localhost:8080/docs
 ## Create
 Для создания шаблона найдите енд поинт по адрессу http://localhost:8080/api/v1/forms/create
 ## Delete
 Для удаления шаблонов найдите енд поинт по адрессу http://localhost:8080/api/v1/forms/delete/{id}
 ## get-form
-Для поиска шаблна найдите енд поинт по адрессу http://localhost:8080/api/v1/forms/get_form
+Для поиска шаблона найдите енд поинт по адрессу http://localhost:8080/api/v1/forms/get_form
 
 # Test
 Для того что бы провести тесты нужно зайти в docker image и провести там тесты:
